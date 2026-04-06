@@ -1,42 +1,46 @@
-name: CI/CD Demo
+name: CI/CD Demo Advanced
 
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   pipeline:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: 📥 Checkout code
       uses: actions/checkout@v3
 
-    - name: Build
+    - name: 🔨 Build
       run: |
-        echo "🔨 Building..."
+        echo "🔨 Building project..."
         if [ $((RANDOM % 5)) -eq 0 ]; then
           echo "❌ Build failed!"
           exit 1
         fi
+        echo "✅ Build success!"
 
-    - name: Test
+    - name: 🧪 Test
       run: |
-        echo "🧪 Testing..."
+        echo "🧪 Running tests..."
         if [ $((RANDOM % 5)) -eq 0 ]; then
           echo "❌ Test failed!"
           exit 1
         fi
+        echo "✅ All tests passed!"
 
-    - name: Deploy Staging
+    - name: 🚀 Deploy to Staging
       run: |
         echo "🚀 Deploying to Staging..."
         if [ $((RANDOM % 5)) -eq 0 ]; then
-          echo "❌ Staging failed!"
+          echo "❌ Staging deployment failed!"
           exit 1
         fi
+        echo "✅ Staging deployed!"
 
-    - name: Deploy Production
+    - name: 🚀 Deploy to Production
       run: |
         echo "🚀 Deploying to Production..."
-        echo "✅ Done!"
+        echo "✅ Production deployed successfully!"
