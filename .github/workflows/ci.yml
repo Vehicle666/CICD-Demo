@@ -15,12 +15,11 @@ jobs:
     - name: Build
       run: echo "🔨 Building project..."
 
-    - name: Fake Test
-      run: |
-        echo "🧪 Running fake tests..."
-        echo "Test Login... PASS"
-        echo "Test Register... PASS"
-        echo "✅ All tests passed!"
+- name: Fake Test
+  run: |
+    echo "🧪 Running fake tests..."
+    echo "❌ Test failed!"
+    exit 1
 
     - name: Deploy
       run: echo "🚀 Deploying..."
