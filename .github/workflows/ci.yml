@@ -1,4 +1,4 @@
-name: CI/CD Demo Advanced
+name: CI/CD Demo Controlled
 
 on:
   push:
@@ -13,34 +13,65 @@ jobs:
     - name: 📥 Checkout code
       uses: actions/checkout@v3
 
+    - name: 🔍 Detect Mode
+      id: mode
+      run: |
+        if [ -f "TestSuccess" ]; then
+          echo "mode=success" >> $GITHUB_OUTPUT
+        elif [ -f "TestRandom" ]; then
+          echo "mode=random" >> $GITHUB_OUTPUT
+        else
+          echo "mode=random" >> $GITHUB_OUTPUT
+        fi
+
     - name: 🔨 Build
       run: |
-        echo "🔨 Building project..."
-        if [ $((RANDOM % 5)) -eq 0 ]; then
-          echo "❌ Build failed!"
-          exit 1
+        echo "🔨 Building..."
+        if [ "${{ steps.mode.outputs.mode }}" = "random" ]; then
+          NUM=$((RANDOM % 4))
+          echo "Random: $NUM"
+          if [ $NUM -eq 0 ]; then
+            echo "❌ Build failed!"
+            exit 1
+          fi
         fi
         echo "✅ Build success!"
 
     - name: 🧪 Test
       run: |
-        echo "🧪 Running tests..."
-        if [ $((RANDOM % 5)) -eq 0 ]; then
-          echo "❌ Test failed!"
-          exit 1
+        echo "🧪 Testing..."
+        if [ "${{ steps.mode.outputs.mode }}" = "random" ]; then
+          NUM=$((RANDOM % 4))
+          echo "Random: $NUM"
+          if [ $NUM -eq 1 ]; then
+            echo "❌ Test failed!"
+            exit 1
+          fi
         fi
-        echo "✅ All tests passed!"
+        echo "✅ Test passed!"
 
-    - name: 🚀 Deploy to Staging
+    - name: 🚀 Deploy Staging
       run: |
         echo "🚀 Deploying to Staging..."
-        if [ $((RANDOM % 5)) -eq 0 ]; then
-          echo "❌ Staging deployment failed!"
-          exit 1
+        if [ "${{ steps.mode.outputs.mode }}" = "random" ]; then
+          NUM=$((RANDOM % 4))
+          echo "Random: $NUM"
+          if [ $NUM -eq 2 ]; then
+            echo "❌ Staging failed!"
+            exit 1
+          fi
         fi
         echo "✅ Staging deployed!"
 
-    - name: 🚀 Deploy to Production
+    - name: 🚀 Deploy Production
       run: |
         echo "🚀 Deploying to Production..."
-        echo "✅ Production deployed successfully!"
+        if [ "${{ steps.mode.outputs.mode }}" = "random" ]; then
+          NUM=$((RANDOM % 4))
+          echo "Random: $NUM"
+          if [ $NUM -eq 3 ]; then
+            echo "❌ Production failed!"
+            exit 1
+          fi
+        fi
+        echo "✅ Production deployed!"
