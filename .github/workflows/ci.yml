@@ -13,13 +13,30 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Build
-      run: echo "🔨 Building project..."
+      run: |
+        echo "🔨 Building..."
+        if [ $((RANDOM % 5)) -eq 0 ]; then
+          echo "❌ Build failed!"
+          exit 1
+        fi
 
-- name: Fake Test
-  run: |
-    echo "🧪 Running fake tests..."
-    echo "❌ Test failed!"
-    exit 1
+    - name: Test
+      run: |
+        echo "🧪 Testing..."
+        if [ $((RANDOM % 5)) -eq 0 ]; then
+          echo "❌ Test failed!"
+          exit 1
+        fi
 
-    - name: Deploy
-      run: echo "🚀 Deploying..."
+    - name: Deploy Staging
+      run: |
+        echo "🚀 Deploying to Staging..."
+        if [ $((RANDOM % 5)) -eq 0 ]; then
+          echo "❌ Staging failed!"
+          exit 1
+        fi
+
+    - name: Deploy Production
+      run: |
+        echo "🚀 Deploying to Production..."
+        echo "✅ Done!"
