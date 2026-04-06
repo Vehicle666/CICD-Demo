@@ -1,0 +1,26 @@
+name: CI/CD Demo
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build
+      run: echo "🔨 Building project..."
+
+    - name: Fake Test
+      run: |
+        echo "🧪 Running fake tests..."
+        echo "Test Login... PASS"
+        echo "Test Register... PASS"
+        echo "✅ All tests passed!"
+
+    - name: Deploy
+      run: echo "🚀 Deploying..."
