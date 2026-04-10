@@ -1,20 +1,24 @@
-name: CI/CD Demo Controlled
+name: CI/CD Demo Full Pipeline
 
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
+
+# =========================
+# BUILD + TEST + STAGING
+# =========================
   pipeline:
     runs-on: ubuntu-latest
 
-    # ✅ Fix warning Node.js 20 → dùng Node 24
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
-    - name: 📥 Checkout code
+
+    - name: 📥 Checkout Code
       uses: actions/checkout@v4
 
     - name: 🔍 Detect Mode
@@ -22,60 +26,89 @@ jobs:
       run: |
         if [ -f "TestSuccess" ]; then
           echo "mode=success" >> $GITHUB_OUTPUT
-        elif [ -f "TestRandom" ]; then
-          echo "mode=random" >> $GITHUB_OUTPUT
         else
           echo "mode=random" >> $GITHUB_OUTPUT
         fi
 
-    - name: 🔨 Build
+    # BUILD
+    - name: 🔨 Auto Build
       run: |
-        echo "🔨 Building..."
+        echo "🔨 Building project..."
         if [ "${{ steps.mode.outputs.mode }}" = "random" ]; then
           NUM=$((RANDOM % 4))
-          echo "Random: $NUM"
+          echo "Random Number: $NUM"
           if [ $NUM -eq 0 ]; then
-            echo "❌ Build failed!"
+            echo "❌ Build thất bại!"
             exit 1
           fi
         fi
-        echo "✅ Build success!"
+        echo "✅ Build thành công!"
 
-    - name: 🧪 Test
+    # TEST
+    - name: 🧪 Auto Unit Test
       run: |
-        echo "🧪 Testing..."
+        echo "🧪 Running Unit Test..."
         if [ "${{ steps.mode.outputs.mode }}" = "random" ]; then
           NUM=$((RANDOM % 4))
-          echo "Random: $NUM"
+          echo "Random Number: $NUM"
           if [ $NUM -eq 1 ]; then
-            echo "❌ Test failed!"
+            echo "❌ Test thất bại!"
             exit 1
           fi
         fi
-        echo "✅ Test passed!"
+        echo "✅ Test thành công!"
 
-    - name: 🚀 Deploy Staging
+    # STAGING
+    - name: 🚀 Auto Deploy Staging
       run: |
         echo "🚀 Deploying to Staging..."
         if [ "${{ steps.mode.outputs.mode }}" = "random" ]; then
           NUM=$((RANDOM % 4))
-          echo "Random: $NUM"
+          echo "Random Number: $NUM"
           if [ $NUM -eq 2 ]; then
-            echo "❌ Staging failed!"
+            echo "❌ Deploy Staging thất bại!"
             exit 1
           fi
         fi
-        echo "✅ Staging deployed!"
+        echo "✅ Deploy Staging thành công!"
+
+    # FAIL NOTIFY
+    - name: 📢 Notify Stop Pipeline
+      if: failure()
+      run: |
+        echo "================================="
+        echo "❌ PIPELINE ĐÃ DỪNG DO CÓ LỖI!"
+        echo "================================="
+
+
+# =========================
+# MANUAL APPROVAL + PROD
+# =========================
+  deploy-production:
+    needs: pipeline
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    steps:
 
     - name: 🚀 Deploy Production
       run: |
         echo "🚀 Deploying to Production..."
-        if [ "${{ steps.mode.outputs.mode }}" = "random" ]; then
-          NUM=$((RANDOM % 4))
-          echo "Random: $NUM"
-          if [ $NUM -eq 3 ]; then
-            echo "❌ Production failed!"
-            exit 1
-          fi
+
+        NUM=$((RANDOM % 4))
+        echo "Random Number: $NUM"
+
+        if [ $NUM -eq 3 ]; then
+          echo "❌ Deploy Production thất bại!"
+          exit 1
         fi
-        echo "✅ Production deployed!"
+
+        echo "✅ Deploy Production thành công!"
+
+    - name: 🎉 System Stable
+      run: |
+        echo "================================="
+        echo "✅ HỆ THỐNG PRODUCTION ỔN ĐỊNH!"
+        echo "================================="
